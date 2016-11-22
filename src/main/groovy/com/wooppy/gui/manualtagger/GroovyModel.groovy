@@ -10,7 +10,16 @@ package com.wooppy.gui.manualtagger
  *
  * @author lisab
  */
-class GroovyLogic {
-	
+class GroovyModel{
+    
+    /**
+    * 
+    */
+    ArrayList<String> queryList = new ArrayList<String>()
+    
+    /**
+    */
+    ArrayList<String> sentenceList = new ArrayList<String>()
+
 }
 
