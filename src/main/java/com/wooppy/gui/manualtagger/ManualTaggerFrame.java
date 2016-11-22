@@ -5,13 +5,15 @@
  */
 package com.wooppy.gui.manualtagger;
 
+import java.awt.event.ActionListener;
 import java.lang.String;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author lisab
  */
-public class ManualTaggerFrame extends javax.swing.JFrame {
+public class ManualTaggerFrame extends javax.swing.JFrame implements ActionListener, ChangeListener {
 
     /**
      * Creates new form ManualTaggerFrame
@@ -31,7 +33,6 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jFileChooser1 = new javax.swing.JFileChooser();
-        buttonGroup1 = new javax.swing.ButtonGroup();
         tagChooserInternalFrame = new javax.swing.JInternalFrame();
         jScrollPane3 = new javax.swing.JScrollPane();
         tagChooserList = new javax.swing.JList<>();
@@ -44,6 +45,7 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         jTextPane1 = new javax.swing.JTextPane();
         queryNumberLabel = new javax.swing.JLabel();
         retokenizeButton = new javax.swing.JButton();
+        saveEditsButton = new javax.swing.JButton();
         tokenInternalFrame = new javax.swing.JInternalFrame();
         editLineToggleButton = new javax.swing.JToggleButton();
         tokenTableScrollPane = new javax.swing.JScrollPane();
@@ -56,7 +58,7 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         saveMenuItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        helpMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Manual Tagger GUI");
@@ -79,11 +81,10 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
             tagChooserInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tagChooserInternalFrameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tagListLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tagChooserInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tagListLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(tagChooserInternalFrameLayout.createSequentialGroup()
-                .addComponent(jScrollPane3)
-                .addGap(12, 12, 12))
         );
         tagChooserInternalFrameLayout.setVerticalGroup(
             tagChooserInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -97,30 +98,14 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         queryInternalFrame.setVisible(true);
 
         prevQueryButton.setText("Previous Query");
-        prevQueryButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                prevQueryButtonActionPerformed(evt);
-            }
-        });
+        prevQueryButton.addActionListener(this);
 
         nextQueryButton.setText("Next Query");
-        nextQueryButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                nextQueryButtonActionPerformed(evt);
-            }
-        });
+        nextQueryButton.addActionListener(this);
 
         editQueryToggleButton.setText("Toggle Edit");
-        editQueryToggleButton.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                editQueryToggleButtonStateChanged(evt);
-            }
-        });
-        editQueryToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editQueryToggleButtonActionPerformed(evt);
-            }
-        });
+        editQueryToggleButton.addChangeListener(this);
+        editQueryToggleButton.addActionListener(this);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, editQueryToggleButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), jTextPane1, org.jdesktop.beansbinding.BeanProperty.create("editable"));
         bindingGroup.addBinding(binding);
@@ -131,26 +116,27 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
 
         retokenizeButton.setText("Retokenize");
 
+        saveEditsButton.setText("Save Edits");
+
         javax.swing.GroupLayout queryInternalFrameLayout = new javax.swing.GroupLayout(queryInternalFrame.getContentPane());
         queryInternalFrame.getContentPane().setLayout(queryInternalFrameLayout);
         queryInternalFrameLayout.setHorizontalGroup(
             queryInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(queryInternalFrameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(queryInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(queryTextScrollPane)
-                    .addGroup(queryInternalFrameLayout.createSequentialGroup()
-                        .addGroup(queryInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(queryNumberLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(prevQueryButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(nextQueryButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(editQueryToggleButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(retokenizeButton)
-                        .addGap(0, 231, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGroup(queryInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(queryNumberLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(prevQueryButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(nextQueryButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(editQueryToggleButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(retokenizeButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(saveEditsButton)
+                .addContainerGap(84, Short.MAX_VALUE))
+            .addComponent(queryTextScrollPane)
         );
         queryInternalFrameLayout.setVerticalGroup(
             queryInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,20 +148,17 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
                     .addComponent(prevQueryButton)
                     .addComponent(nextQueryButton)
                     .addComponent(editQueryToggleButton)
-                    .addComponent(retokenizeButton))
+                    .addComponent(retokenizeButton)
+                    .addComponent(saveEditsButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(queryTextScrollPane)
-                .addContainerGap())
+                .addGap(18, 18, 18))
         );
 
         tokenInternalFrame.setVisible(true);
 
         editLineToggleButton.setText("Toggle Edit");
-        editLineToggleButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editLineToggleButtonActionPerformed(evt);
-            }
-        });
+        editLineToggleButton.addActionListener(this);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -201,7 +184,7 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
                 .addGroup(tokenInternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tokenInternalFrameLayout.createSequentialGroup()
                         .addComponent(editLineToggleButton)
-                        .addGap(0, 886, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(tokenTableScrollPane))
                 .addContainerGap())
             .addGroup(tokenInternalFrameLayout.createSequentialGroup()
@@ -223,30 +206,15 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         fileMenu.setText("File");
 
         openQueriesMenuItem.setText("Open Queries");
-        openQueriesMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openQueriesMenuItemActionPerformed(evt);
-                openQueriesMenuItemActionPerformed1(evt);
-                openQueriesMenuItemActionPerformed2(evt);
-            }
-        });
+        openQueriesMenuItem.addActionListener(this);
         fileMenu.add(openQueriesMenuItem);
 
         openEntityTagMenuItem.setText("Open Entity Tags");
-        openEntityTagMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openEntityTagMenuItemActionPerformed(evt);
-            }
-        });
+        openEntityTagMenuItem.addActionListener(this);
         fileMenu.add(openEntityTagMenuItem);
 
         saveMenuItem.setText("Save");
-        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                saveMenuItemActionPerformed(evt);
-                saveMenuItemActionPerformed1(evt);
-            }
-        });
+        saveMenuItem.addActionListener(this);
         fileMenu.add(saveMenuItem);
 
         topMenuBar.add(fileMenu);
@@ -254,17 +222,13 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         editMenu.setText("Edit");
 
         jMenuItem1.setText("Undo");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
+        jMenuItem1.addActionListener(this);
         editMenu.add(jMenuItem1);
 
         topMenuBar.add(editMenu);
 
-        jMenu3.setText("Help");
-        topMenuBar.add(jMenu3);
+        helpMenu.setText("Help");
+        topMenuBar.add(helpMenu);
 
         setJMenuBar(topMenuBar);
 
@@ -276,11 +240,12 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(tokenInternalFrame)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(queryInternalFrame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tagChooserInternalFrame))
-                    .addComponent(tokenInternalFrame))
-                .addContainerGap())
+                        .addComponent(tagChooserInternalFrame))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -297,6 +262,44 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
         bindingGroup.bind();
 
         pack();
+    }
+
+    // Code for dispatching events from components to event handlers.
+
+    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        if (evt.getSource() == prevQueryButton) {
+            ManualTaggerFrame.this.prevQueryButtonActionPerformed(evt);
+        }
+        else if (evt.getSource() == nextQueryButton) {
+            ManualTaggerFrame.this.nextQueryButtonActionPerformed(evt);
+        }
+        else if (evt.getSource() == editQueryToggleButton) {
+            ManualTaggerFrame.this.editQueryToggleButtonActionPerformed(evt);
+        }
+        else if (evt.getSource() == editLineToggleButton) {
+            ManualTaggerFrame.this.editLineToggleButtonActionPerformed(evt);
+        }
+        else if (evt.getSource() == openQueriesMenuItem) {
+            ManualTaggerFrame.this.openQueriesMenuItemActionPerformed(evt);
+            ManualTaggerFrame.this.openQueriesMenuItemActionPerformed1(evt);
+            ManualTaggerFrame.this.openQueriesMenuItemActionPerformed2(evt);
+        }
+        else if (evt.getSource() == openEntityTagMenuItem) {
+            ManualTaggerFrame.this.openEntityTagMenuItemActionPerformed(evt);
+        }
+        else if (evt.getSource() == saveMenuItem) {
+            ManualTaggerFrame.this.saveMenuItemActionPerformed(evt);
+            ManualTaggerFrame.this.saveMenuItemActionPerformed1(evt);
+        }
+        else if (evt.getSource() == jMenuItem1) {
+            ManualTaggerFrame.this.jMenuItem1ActionPerformed(evt);
+        }
+    }
+
+    public void stateChanged(javax.swing.event.ChangeEvent evt) {
+        if (evt.getSource() == editQueryToggleButton) {
+            ManualTaggerFrame.this.editQueryToggleButtonStateChanged(evt);
+        }
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -392,14 +395,13 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    javax.swing.ButtonGroup buttonGroup1;
     javax.swing.JToggleButton editLineToggleButton;
     javax.swing.JMenu editMenu;
     javax.swing.JToggleButton editQueryToggleButton;
     javax.swing.JMenu fileMenu;
+    javax.swing.JMenu helpMenu;
     javax.swing.JFileChooser jFileChooser1;
     javax.swing.JLabel jLabel1;
-    javax.swing.JMenu jMenu3;
     javax.swing.JMenuItem jMenuItem1;
     javax.swing.JScrollPane jScrollPane3;
     javax.swing.JTable jTable1;
@@ -412,6 +414,7 @@ public class ManualTaggerFrame extends javax.swing.JFrame {
     javax.swing.JLabel queryNumberLabel;
     javax.swing.JScrollPane queryTextScrollPane;
     javax.swing.JButton retokenizeButton;
+    javax.swing.JButton saveEditsButton;
     javax.swing.JMenuItem saveMenuItem;
     javax.swing.JInternalFrame tagChooserInternalFrame;
     javax.swing.JList<String> tagChooserList;
