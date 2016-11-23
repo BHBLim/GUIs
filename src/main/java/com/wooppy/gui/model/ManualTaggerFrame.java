@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.wooppy.gui.manualtagger;
+package com.wooppy.gui.model;
 
 import java.awt.event.ActionListener;
 import java.lang.String;

@@ -18,25 +18,37 @@ import javafx.stage.Window
 import javafx.scene.Node
 
 public class TaggerController {
+    TaggerModel model
 
-    ArrayList<String> queryList = new ArrayList<String>()
-    ArrayList<String> currentTokenList = new ArrayList<String>()
-    String something = "Default"
-    Integer lineNumberMax = 0
-
+    /**
+     * Bound to number of lines shown on UI
+     */
     IntegerProperty lineNumberMaxProperty = new SimpleIntegerProperty(0)
 
+    /**
+     * Bound to number of queries shown on UI
+     */
+    IntegerProperty queryNumberMaxProperty = new SimpleIntegerProperty(3)
 
     @FXML
     void increaseLineNumberMax(){
         lineNumberMaxProperty.setValue(lineNumberMaxProperty.getValue()+1)
-
     }
 
-    class MyModel {
-        Integer test = 1
+    @FXML
+    void decreaseLineNumberMax(){
+        lineNumberMaxProperty.setValue(lineNumberMaxProperty.getValue()-1)
     }
 
+    @FXML
+    void increaseQueryNumberMax(){
+        queryNumberMaxProperty.setValue(queryNumberMaxProperty.getValue()+1)
+    }
+
+    @FXML
+    void decreaseQueryNumberMax(){
+        queryNumberMaxProperty.setValue(queryNumberMaxProperty.getValue()-1)
+    }
 
 
     /**
@@ -59,10 +71,14 @@ public class TaggerController {
         if (file!=null) {
             try {
                 println "Opening " + file.toString()
-                file
+                file.eachLine(){ it ->
+                    model.getQueryList() << it
+                }
             } catch (IOException e) {
                 println "Could not open the file!"
                 e.printStackTrace()
+            } finally {
+                println model.getQueryList()
             }
         }
     }
@@ -84,9 +100,11 @@ public class TaggerController {
 
     public void initialize() {
 
-        //Bindings for various UI components
-        lineNumberMaxLabel.textProperty().bind(lineNumberMaxProperty.asString());
+        model = new TaggerModel()
 
+        //Bindings for various UI components
+        lineNumberMaxLabel.textProperty().bind(lineNumberMaxProperty.asString())
+        queryNumberMaxLabel.textProperty().bind(queryNumberMaxProperty.asString())
 
     }
 

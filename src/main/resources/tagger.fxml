@@ -70,7 +70,8 @@
                            <children>
                               <Label alignment="CENTER" text="Query: " />
                               <TextField fx:id="queryNumberTextField" alignment="TOP_LEFT" prefHeight="25.0" prefWidth="63.0" />
-                              <Label fx:id="queryNumberMaxLabel" alignment="CENTER" text=" out of " />
+                              <Label alignment="CENTER" text=" out of " />
+                               <Label fx:id="queryNumberMaxLabel" alignment="CENTER"/>
                            </children>
                            <VBox.margin>
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />

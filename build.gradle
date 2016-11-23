@@ -7,6 +7,7 @@ buildscript {
         classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.7.0'
     }
     repositories {
+
         mavenLocal()
         mavenCentral()
 
@@ -16,7 +17,7 @@ buildscript {
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-mainClassName = 'com.wooppy.gui.manualtagger.ManualTaggerFrame'
+mainClassName = 'com.wooppy.gui.model.ManualTaggerFrame'
 
 // NetBeans will automatically add "run" and "debug" tasks relying on the
 // "mainClass" property. You may however define the property prior executing
@@ -30,6 +31,9 @@ if (!hasProperty('mainClass')) {
 }
 
 repositories {
+
+//    maven { url "http://dl.bintray.com/groovyfx/maven" }
+    jcenter()
     mavenLocal()
     mavenCentral()
     // You may define additional repositories, or even remove "mavenCentral()".
@@ -45,6 +49,10 @@ dependencies {
     
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all
     compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.7'
+
+    compile 'org.groovyfx:groovyfx:8.0.0'
+
+
 
     // https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp
     compile group: 'edu.stanford.nlp', name: 'stanford-corenlp', version: '3.6.0'

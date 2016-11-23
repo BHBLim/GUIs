@@ -12,6 +12,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="GUIs_main" />
     <orderEntry type="library" name="Gradle: org.codehaus.groovy:groovy-all:2.4.7" level="project" />
+    <orderEntry type="library" name="Gradle: org.groovyfx:groovyfx:8.0.0" level="project" />
     <orderEntry type="library" name="Gradle: edu.stanford.nlp:stanford-corenlp:3.6.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jdesktop:beansbinding:1.2.1" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.10" level="project" />
@@ -25,6 +26,7 @@
     <orderEntry type="library" name="Gradle: xerces:xercesImpl:2.8.0" level="project" />
     <orderEntry type="library" name="Gradle: xalan:xalan:2.7.0" level="project" />
     <orderEntry type="library" name="Gradle: javax.xml.bind:jaxb-api:2.2.7" level="project" />
+    <orderEntry type="library" name="Gradle: xml-apis:xml-apis:2.0.2" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="GUIs_main" />
 </module>
