@@ -10,7 +10,6 @@ public class TaggerApp extends Application {
 
      @Override
     public void start(Stage primaryStage) throws Exception{
-        System.out.println(getClass());
 
         Parent root = null
 

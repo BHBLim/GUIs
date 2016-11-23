@@ -15,6 +15,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -25,8 +26,8 @@
             <Menu mnemonicParsing="false" text="File">
                <items>
                   <MenuItem mnemonicParsing="false" text="New" />
-                  <MenuItem mnemonicParsing="false" onAction="#openQueryFile" text="Open Query File" />
-                   <MenuItem mnemonicParsing="false" onAction="#openEntityTags" text="Open Entity Tags" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadQueryFile" text="Open Query File" />
+                   <MenuItem mnemonicParsing="false" onAction="#loadEntityTagsFile" text="Open Entity Tags" />
                   <Menu mnemonicParsing="false" text="Open Recent" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Close" />
@@ -64,14 +65,15 @@
          <items>
             <SplitPane dividerPositions="0.40979955456570155" prefHeight="160.0" prefWidth="200.0">
               <items>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
+                  <VBox prefHeight="306.0" prefWidth="431.0">
                      <children>
                         <HBox prefHeight="34.0" prefWidth="391.0" spacing="2.0">
                            <children>
                               <Label alignment="CENTER" text="Query: " />
                               <TextField fx:id="queryNumberTextField" alignment="TOP_LEFT" prefHeight="25.0" prefWidth="63.0" />
                               <Label alignment="CENTER" text=" out of " />
-                               <Label fx:id="queryNumberMaxLabel" alignment="CENTER"/>
+                               <Label fx:id="queryNumberMaxLabel" alignment="CENTER" />
+                              <Button mnemonicParsing="false" text="Change" />
                            </children>
                            <VBox.margin>
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -79,37 +81,21 @@
                         </HBox>
                         <HBox prefHeight="20.0" prefWidth="446.0">
                            <children>
-                              <Button mnemonicParsing="false" text="Previous">
-                                 <HBox.margin>
-                                    <Insets right="2.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button mnemonicParsing="false" text="Next">
-                                 <HBox.margin>
-                                    <Insets right="2.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button mnemonicParsing="false" text="Save Edits">
-                                 <HBox.margin>
-                                    <Insets right="2.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <Button mnemonicParsing="false" text="Retokenize">
-                                 <HBox.margin>
-                                    <Insets right="2.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <ToggleButton mnemonicParsing="false" text="Toggle Editable" textAlignment="JUSTIFY">
-                                 <HBox.margin>
-                                    <Insets right="2.0" />
-                                 </HBox.margin>
-                              </ToggleButton>
+                              <FlowPane>
+                                 <children>
+                                    <Button mnemonicParsing="false" text="Previous" />
+                                    <Button mnemonicParsing="false" text="Next" />
+                                    <Button mnemonicParsing="false" text="Save Edits" />
+                                    <Button mnemonicParsing="false" text="Retokenize" />
+                                    <ToggleButton mnemonicParsing="false" text="Toggle Editable" textAlignment="JUSTIFY" />
+                                 </children>
+                              </FlowPane>
                            </children>
                            <VBox.margin>
                               <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                            </VBox.margin>
                         </HBox>
-                        <TextArea fx:id="queryTextArea" prefHeight="200.0" prefWidth="343.0" />
+                        <TextArea fx:id="queryTextArea" prefHeight="200.0" prefWidth="343.0" promptText="Load a file from the top :D" wrapText="true" />
                      </children>
                      <padding>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -119,7 +105,7 @@
                         <Label text="Tag Chooser" />
                         <ScrollPane>
                            <content>
-                              <ListView fx:id="tagList" prefHeight="281.0" prefWidth="558.0" />
+                              <ListView fx:id="tagList" prefHeight="281.0" prefWidth="641.0" />
                            </content>
                         </ScrollPane>
                      </children>
@@ -134,8 +120,8 @@
                   <HBox prefHeight="34.0" prefWidth="391.0" spacing="2.0">
                      <children>
                         <Label alignment="CENTER" text="Line: " />
-                        <TextField fx:id="lineNumberTextField" alignment="TOP_LEFT" prefHeight="25.0" prefWidth="63.0"/>
-                        <Label  alignment="CENTER" text=" out of " />
+                        <TextField fx:id="lineNumberTextField" alignment="TOP_LEFT" prefHeight="25.0" prefWidth="63.0" />
+                        <Label alignment="CENTER" text=" out of " />
                          <Label fx:id="lineNumberMaxLabel" alignment="CENTER" />
                      </children>
                   </HBox>
@@ -166,7 +152,7 @@
                               <Insets right="2.0" />
                            </HBox.margin>
                         </ToggleButton>
-                         <Button mnemonicParsing="false" text="TestIncrease" onAction="#increaseLineNumberMax">
+                         <Button mnemonicParsing="false" onAction="#increaseLineNumberMax" text="TestIncrease">
                              <HBox.margin>
                                  <Insets right="2.0" />
                              </HBox.margin>
