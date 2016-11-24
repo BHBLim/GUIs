@@ -82,7 +82,7 @@ class TaggerModel {
     static class Query {
         String originalText
         /**
-         * If there are no modifications to the original text this should be the same as allOriginalText
+         * If there are no modifications to the original text this should be the same as originalText
          */
         String currentText
         ArrayList<TokenTagPair> taggedTokens
