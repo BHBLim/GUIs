@@ -20,21 +20,22 @@ class TaggerModel {
 
     //region Bound Properties
 
+    //Index starts from 1
     IntegerProperty currentQueryIndexProperty = new SimpleIntegerProperty(0)
+    //Index starts from 1
     IntegerProperty currentLineIndexProperty = new SimpleIntegerProperty(0)
     IntegerProperty currentTokenIndexProperty = new SimpleIntegerProperty(0)
-
     StringProperty currentQueryTextProperty = new SimpleStringProperty()
 
     /**
      * Bound to number of lines shown on UI
      */
-    IntegerProperty lineNumberMaxProperty = new SimpleIntegerProperty(0)
+    IntegerProperty lineListSizeProperty = new SimpleIntegerProperty(0)
 
     /**
      * Bound to number of queries shown on UI
      */
-    IntegerProperty queryNumberMaxProperty = new SimpleIntegerProperty(0)
+    IntegerProperty queryListSizeProperty = new SimpleIntegerProperty(0)
     //endregion
 
     /**
@@ -48,8 +49,10 @@ class TaggerModel {
     ArrayList<Query> queryList = new ArrayList<Query>()
 
     /**
-     * List of e
+     * Current query, which should always be a reference to the current
+     * position in the queryList object
      */
+    Query currentQuery
 
     /**
      * Load available tags into file
@@ -70,7 +73,7 @@ class TaggerModel {
          * Could possibly make this multiple tags?
          * TODO Look into making multi tags
          */
-        String tag
+        ArrayList<String> tagList = new ArrayList<String>()
         Boolean isAmbiguous = false
     }
 
@@ -83,11 +86,24 @@ class TaggerModel {
          * If there are no modifications to the original text this should be the same as originalText
          */
         String currentText
-        ArrayList<TokenTagPair> taggedTokens
+
+        ArrayList<TokenTagPair> taggedTokens = new ArrayList<TokenTagPair>()
         Boolean isTagged = false
         Boolean hasAmbiguities = false
+
+        Query(String originalText) {
+            this.originalText = new String(originalText)
+            this.currentText = new String(originalText)
+        }
     }
 
+    TaggerModel() {
+        this.queryList = new ArrayList<Query>([new Query(
+                """
+This is just placeholder text
+Open a Query File from above""")])
 
+        this.currentQuery = this.queryList.first()
+    }
 }
 

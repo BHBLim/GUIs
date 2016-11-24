@@ -12,8 +12,8 @@
             <Menu mnemonicParsing="false" text="File">
                <items>
                   <MenuItem mnemonicParsing="false" text="New" />
-                  <MenuItem mnemonicParsing="false" onAction="#loadQueryFile" text="Open Query File" />
-                   <MenuItem mnemonicParsing="false" onAction="#loadEntityTagsFile" text="Open Entity Tags" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleLoadQueryFileMenuItem" text="Open Query File" />
+                   <MenuItem mnemonicParsing="false" onAction="#handleLoadEntityTagsMenuItem" text="Open Entity Tags" />
                   <Menu mnemonicParsing="false" text="Open Recent" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Close" />
@@ -70,13 +70,13 @@
                               <FlowPane>
                                  <children>
                                      <Button fx:id="previousQueryButton" mnemonicParsing="false"
-                                             onAction="#selectPreviousQuery" text="Previous"/>
-                                     <Button fx:id="nextQueryButton" mnemonicParsing="false" onAction="#selectNextQuery"
+                                             onAction="#handlePreviousQueryButton" text="Previous"/>
+                                     <Button fx:id="nextQueryButton" mnemonicParsing="false" onAction="#handleNextQueryButton"
                                              text="Next"/>
                                      <Button fx:id="saveQueryEditsButton" mnemonicParsing="false"
                                              onAction="#saveQueryEdits" text="Save Edits"/>
                                      <Button fx:id="retokenizeQueryButton" mnemonicParsing="false"
-                                             onAction="#retokenizeQuery" text="Retokenize"/>
+                                             onAction="#handleTokenizeButton" text="Retokenize"/>
                                      <ToggleButton fx:id="editQueryToggleButton" mnemonicParsing="false"
                                                    text="Toggle Editable" textAlignment="JUSTIFY"/>
                                  </children>
@@ -118,18 +118,18 @@
                   </HBox>
                   <HBox prefHeight="20.0" prefWidth="446.0">
                      <children>
-                         <Button fx:id="previousLineButton" mnemonicParsing="false" onAction="#selectPreviousLine"
+                         <Button fx:id="previousLineButton" mnemonicParsing="false" onAction="#handlePreviousLineButton"
                                  text="Previous">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>
                         </Button>
-                         <Button fx:id="nextLine" mnemonicParsing="false" text="Next">
+                         <Button fx:id="nextLineButton" mnemonicParsing="false" text="Next" onAction="#handleNextLineButton">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>
                         </Button>
-                         <Button fx:id="saveTokenEdits" mnemonicParsing="false" text="Save Edits">
+                         <Button fx:id="saveTokenEditsButton" mnemonicParsing="false" text="Save Edits" onAction="#handleSaveTokenEditsButton">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>

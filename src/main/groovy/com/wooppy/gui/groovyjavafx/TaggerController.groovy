@@ -1,5 +1,8 @@
 package com.wooppy.gui.groovyjavafx
 
+import edu.stanford.nlp.ling.CoreLabel
+import edu.stanford.nlp.process.CoreLabelTokenFactory
+import edu.stanford.nlp.process.PTBTokenizer
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
@@ -12,24 +15,69 @@ import javafx.stage.FileChooser
  * Handles application logic and the interaction between the UI and background model
  */
 class TaggerController {
-    TaggerModel model
 
+    /**
+     * Initialize the controller. By default, all methods and variables are public
+     * if nothing is specified
+     */
+
+    void initialize() {
+
+        model = new TaggerModel()
+
+        //Bindings for various UI components
+        lineNumberMaxLabel.textProperty().bind(model.lineListSizeProperty.asString())
+        queryNumberMaxLabel.textProperty().bind(model.queryListSizeProperty.asString())
+        queryTextArea.editableProperty().bindBidirectional(editQueryToggleButton.selectedProperty())
+
+        //Can't bind because it doesn't allow text area to be editable, using a change listener instead
+        // queryTextArea.textProperty().bind(model.currentQueryTextProperty)
+        //  queryNumberTextField.textProperty().bind(model.currentQueryIndexProperty.asString())
+
+        //Bind changes to various properties when index changes
+        //Also, displays starting from 1 not 0
+        model.currentQueryIndexProperty.addListener(new ChangeListener() {
+            @Override
+            void changed(ObservableValue o, Object oldVal,
+                         Object newVal) {
+                model.currentQuery = model.queryList[(int) newVal]
+                model.currentQueryTextProperty.set(model.currentQuery.currentText)
+                queryNumberTextField.setText(((int) newVal + 1).toString())
+            }
+        })
+
+        /**
+         * Listen for changes to currentQueryText and save them to model and UI text
+         */
+        model.currentQueryTextProperty.addListener(new ChangeListener() {
+            @Override
+            void changed(ObservableValue o, Object oldVal,
+                         Object newVal) {
+                queryTextArea.setText(model.currentQueryTextProperty.get())
+                model.currentQuery.setCurrentText(model.currentQueryTextProperty.get())
+                tokenizeQuery()
+            }
+        })
+
+    }
+
+    TaggerModel model
 
     //region Methods to modify bound properties
     void increaseLineNumberMax(){
-        model.lineNumberMaxProperty.setValue(model.lineNumberMaxProperty.getValue()+1)
+        model.lineListSizeProperty.setValue(model.lineListSizeProperty.getValue()+1)
     }
 
     void decreaseLineNumberMax(){
-        model.lineNumberMaxProperty.setValue(model.lineNumberMaxProperty.getValue()-1)
+        model.lineListSizeProperty.setValue(model.lineListSizeProperty.getValue()-1)
     }
 
     void increaseQueryNumberMax(){
-        model.lineNumberMaxProperty.setValue(model.queryNumberMaxProperty.getValue()+1)
+        model.lineListSizeProperty.setValue(model.queryListSizeProperty.getValue()+1)
     }
 
     void decreaseQueryNumberMax(){
-        model.lineNumberMaxProperty.setValue(model.queryNumberMaxProperty.getValue()-1)
+        model.lineListSizeProperty.setValue(model.queryListSizeProperty.getValue()-1)
     }
 
     //endregion
@@ -42,15 +90,17 @@ class TaggerController {
     @FXML VBox topBox
     @FXML TextArea queryTextArea
     @FXML ListView tagList
+
+    //Index start from 1
     @FXML TextField queryNumberTextField
     @FXML Label queryNumberMaxLabel
     @FXML TextField lineNumberTextField
     @FXML Label lineNumberMaxLabel
+    @FXML ToggleButton editQueryToggleButton
+    @FXML ToggleButton editTokenToggleButton
     @FXML Button previousLineButton
-    @FXML
-    ToggleButton editQueryToggleButton
-    @FXML
-    ToggleButton editTokenToggleButton
+    @FXML Button nextLineButton
+    @FXML Button saveTokenEditsButton
 
     // End FXML injection
 
@@ -59,7 +109,7 @@ class TaggerController {
      * Tokenization doesn't occur at this stage and is only done when a specific query is loaded.
      * @param actionEvent
      */
-    void loadQueryFile(ActionEvent actionEvent) {
+    void handleLoadQueryFileMenuItem(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser()
         fileChooser.setTitle("Open Query File")
         File file = fileChooser.showOpenDialog(topBox.getScene().getWindow())
@@ -92,7 +142,7 @@ class TaggerController {
                         //Ignore if the buffer is all whitespace
                         if (!queryBuffer.isAllWhitespace()) {
                             //I'm assuming there's a "" at the end of each query, which should have been added anyway
-                            model.getQueryList().add(new TaggerModel.Query(originalText: queryBuffer, currentText: queryBuffer))
+                            model.getQueryList().add(new TaggerModel.Query(queryBuffer))
                         }
                         queryBuffer = ''
                     }
@@ -115,21 +165,21 @@ class TaggerController {
         model.currentQueryIndexProperty.set(0)
         model.currentLineIndexProperty.set(0)
         model.currentTokenIndexProperty.set(0)
-
         //Displays starting from 1
-        model.queryNumberMaxProperty.setValue(model.queryList.size())
-        model.currentQueryTextProperty.set(model.queryList.first().getCurrentText())
-
+        model.currentQuery = model.queryList[0]
+        model.queryListSizeProperty.setValue(model.queryList.size())
+        model.currentQueryTextProperty.set(model.currentQuery.getCurrentText())
+        queryNumberTextField.setText("1")
     }
 
-    void loadEntityTagsFile(ActionEvent actionEvent) {
+    void handleLoadEntityTagsMenuItem(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser()
         fileChooser.setTitle("Open Entity Tags File")
         File file = fileChooser.showOpenDialog(topBox.getScene().getWindow())
         if (file!=null) {
             try {
                 println "Opening " + file.toString()
-                file
+
             } catch (IOException e) {
                 println "Could not open the file!"
                 e.printStackTrace()
@@ -138,70 +188,119 @@ class TaggerController {
     }
 
     void saveQueryEdits() {
-
+        model.currentQueryTextProperty.set(queryTextArea.getText())
     }
 
     /**
      * Pretag a list of tokens according to dictionary and excluded tokens
-     * @param tokens
      */
-    static void pretag(ArrayList<TaggerModel.TokenTagPair> tokens) {
-
-    }
-
-    /**
-     * Initialize the controller. By default, all methods and variables are public
-     * if nothing is specified
-     */
-    void initialize() {
-
-        model = new TaggerModel()
-
-        //Bindings for various UI components
-        lineNumberMaxLabel.textProperty().bind(model.lineNumberMaxProperty.asString())
-        queryNumberMaxLabel.textProperty().bind(model.queryNumberMaxProperty.asString())
-        queryTextArea.editableProperty().bindBidirectional(editQueryToggleButton.selectedProperty())
-
-        //Can't bind because it doesn't allow text area to be editable, using a change listener instead
-//        queryTextArea.textProperty().bind(model.currentQueryTextProperty)
-//        queryNumberTextField.textProperty().bind(model.currentQueryIndexProperty.asString())
-
-        //Bind currentQueryTextProperty and query Number to when index changes but not the other way round
-        //Also, displays starting from 1 not 0
-        model.currentQueryIndexProperty.addListener(new ChangeListener() {
-            @Override
-            void changed(ObservableValue o, Object oldVal,
-                         Object newVal) {
-                model.currentQueryTextProperty.set(model.queryList[(int) newVal].getCurrentText())
-                queryNumberTextField.setText(((int) newVal + 1).toString())
-            }
-        })
-
-        model.currentQueryTextProperty.addListener(new ChangeListener() {
-            @Override
-            void changed(ObservableValue o, Object oldVal,
-                         Object newVal) {
-                queryTextArea.setText(model.currentQueryTextProperty.get())
-            }
-        })
-
+    void pretag() {
+        //TODO finish pretagging part
     }
 
 
-    void selectPreviousQuery(ActionEvent actionEvent) {
-        if (model.currentQueryIndexProperty.get() != 0) {
-            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() - 1)
+    void handlePreviousQueryButton(ActionEvent actionEvent) {
+        goToPreviousQuery()
+    }
+
+    void handleNextQueryButton(ActionEvent actionEvent) {
+        goToNextQuery()
+    }
+
+    void handleTokenizeButton(ActionEvent actionEvent) {
+        tokenizeQuery()
+    }
+
+    void handlePreviousLineButton(ActionEvent actionEvent) {}
+
+    void handleNextLineButton(ActionEvent actionEvent) {}
+
+    void handleSaveTokenEditsButton(ActionEvent actionEvent) {}
+
+    void tokenizeQuery(){
+        StringReader stringReader = new StringReader(model.currentQuery.currentText)
+        PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<>(stringReader,
+                new CoreLabelTokenFactory(), "")
+
+        model.currentQuery.taggedTokens.clear()
+        ptbt.each() { label->
+            model.currentQuery.taggedTokens.add(new TaggerModel.TokenTagPair(token:label.toString()) )
+            pretag()
+        }
+        model.currentQuery.taggedTokens.each(){
+            println it.getToken()
         }
     }
 
-    void selectNextQuery(ActionEvent actionEvent) {
-        int maxIndex = model.queryList.size() - 1
-        if (model.currentQueryIndexProperty.get() != maxIndex)
-            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
-
+    void goToPreviousQuery(){
+        if (model.currentQueryTextProperty.get()!=queryTextArea.getText())
+        {
+            String saveAndResume = "Save, Tokenize and Resume"
+            String saveAndProceed = "Save and Proceed"
+            String discardChanges = "Discard Changes and Proceed"
+            ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(saveAndResume, saveAndProceed, discardChanges )
+            choiceDialog.setContentText("You've made some changes to the query text but have not saved them. What do you want to do?")
+            //Ask if you want to save edits
+            choiceDialog.showAndWait().ifPresent() { response ->
+                switch (response) {
+                    case saveAndResume:
+                        saveQueryEdits()
+                        break
+                    case saveAndProceed:
+                        saveQueryEdits()
+                        if (model.currentQueryIndexProperty.get() != 0) {
+                            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() - 1)
+                        }
+                        break
+                    case discardChanges:
+                        if (model.currentQueryIndexProperty.get() != 0) {
+                            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() - 1)
+                        }
+                        break
+                    default:
+                        break
+                }
+            }
+        } else {
+            if (model.currentQueryIndexProperty.get() != 0) {
+                model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() - 1)
+            }
+        }
     }
 
-    void retokenizeQuery(ActionEvent actionEvent) {}
-
-    void selectPreviousLine(ActionEvent actionEvent) {}
+    void goToNextQuery(){
+        if (model.currentQueryTextProperty.get()!=queryTextArea.getText())
+        {
+            String saveAndResume = "Save, Tokenize and Resume"
+            String saveAndProceed = "Save and Proceed"
+            String discardChanges = "Discard Changes and Proceed"
+            ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(saveAndResume, saveAndProceed, discardChanges )
+            choiceDialog.setContentText("You've made some changes to the query text but have not saved them. What do you want to do?")
+            //Ask if you want to save edits
+            choiceDialog.showAndWait().ifPresent() { response ->
+                switch (response) {
+                    case saveAndResume:
+                        model.currentQueryTextProperty.set(queryTextArea.getText())
+                        break
+                    case saveAndProceed:
+                        model.currentQueryTextProperty.set(queryTextArea.getText())
+                        int maxIndex = model.queryList.size() - 1
+                        if (model.currentQueryIndexProperty.get() != maxIndex)
+                            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
+                        break
+                    case discardChanges:
+                        int maxIndex = model.queryList.size() - 1
+                        if (model.currentQueryIndexProperty.get() != maxIndex)
+                            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
+                        break
+                    default:
+                        break
+                }
+            }
+        } else {
+            int maxIndex = model.queryList.size() - 1
+            if (model.currentQueryIndexProperty.get() != maxIndex)
+                model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
+        }
+    }
 }
