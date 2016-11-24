@@ -8,6 +8,8 @@ package com.wooppy.gui.groovyjavafx
 
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 
 /**
  *  This is the "model" for the tagger. This by right should have pretty much all the background
@@ -17,6 +19,12 @@ import javafx.beans.property.SimpleIntegerProperty
 class TaggerModel {
 
     //region Bound Properties
+
+    IntegerProperty currentQueryIndexProperty = new SimpleIntegerProperty(0)
+    IntegerProperty currentLineIndexProperty = new SimpleIntegerProperty(0)
+    IntegerProperty currentTokenIndexProperty = new SimpleIntegerProperty(0)
+
+    StringProperty currentQueryTextProperty = new SimpleStringProperty()
 
     /**
      * Bound to number of lines shown on UI
@@ -47,16 +55,6 @@ class TaggerModel {
      * Load available tags into file
      */
     ArrayList<String> availableTags = new ArrayList<String>()
-
-
-    Integer currentQueryIndex = 0
-    Integer currentLineIndex = 0
-    Integer currentTokenIndex = 0
-
-    /**
-     * The current query text doesn't necessarily mean that the
-     */
-    String currentQueryText = new String()
 
     /**
      * List of current tokens to be tagged, just after tokenization

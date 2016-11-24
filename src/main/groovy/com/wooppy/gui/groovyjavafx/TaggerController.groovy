@@ -1,19 +1,17 @@
 package com.wooppy.gui.groovyjavafx
 
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
-import javafx.scene.control.Button
-import javafx.scene.control.Label
-import javafx.scene.control.ListView
-import javafx.scene.control.TextArea
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.VBox
 import javafx.stage.FileChooser
 
 /**
  * Handles application logic and the interaction between the UI and background model
  */
-public class TaggerController {
+class TaggerController {
     TaggerModel model
 
 
@@ -49,6 +47,11 @@ public class TaggerController {
     @FXML TextField lineNumberTextField
     @FXML Label lineNumberMaxLabel
     @FXML Button previousLineButton
+    @FXML
+    ToggleButton editQueryToggleButton
+    @FXML
+    ToggleButton editTokenToggleButton
+
     // End FXML injection
 
     /**
@@ -70,9 +73,9 @@ public class TaggerController {
 
                 if (model.getAllOriginalText().last().trim().isEmpty()) {
                     model.getAllOriginalText().dropRight(1)
-                    model.getAllOriginalText().add("");
+                    model.getAllOriginalText().add("")
                 } else {
-                    model.getAllOriginalText().add("");
+                    model.getAllOriginalText().add("")
                 }
             } catch (IOException e) {
                 println "Could not open the file!"
@@ -84,29 +87,39 @@ public class TaggerController {
                 def queryBuffer = new String()
                 model.getAllOriginalText().each() { line ->
                     if (!line.isAllWhitespace())
-                        queryBuffer += line + " "
+                        queryBuffer += line + " \n"
                     else {
                         //Ignore if the buffer is all whitespace
                         if (!queryBuffer.isAllWhitespace()) {
                             //I'm assuming there's a "" at the end of each query, which should have been added anyway
-                            model.getQueryList().add(new TaggerModel.Query(originalText: queryBuffer))
+                            model.getQueryList().add(new TaggerModel.Query(originalText: queryBuffer, currentText: queryBuffer))
                         }
                         queryBuffer = ''
                     }
                 }
-                model.setCurrentQueryIndex(0)
-                model.setCurrentLineIndex(0)
-                model.setCurrentTokenIndex(0)
-                println model.queryList.first().getOriginalText()
-                model.setCurrentQueryText(model.queryList.first().getOriginalText())
-                model.queryNumberMaxProperty.setValue(model.queryList.size()-1)
-                updateQueryTextFieldFromModel()
+
+                resetAll()
 
             } catch (Exception e) {
                 println "You done fecked up when loading the file..."
                 println e.getMessage()
             }
         }
+    }
+
+    /**
+     * Resets all query numbers etc. to the beginning
+     */
+    void resetAll() {
+
+        model.currentQueryIndexProperty.set(0)
+        model.currentLineIndexProperty.set(0)
+        model.currentTokenIndexProperty.set(0)
+
+        //Displays starting from 1
+        model.queryNumberMaxProperty.setValue(model.queryList.size())
+        model.currentQueryTextProperty.set(model.queryList.first().getCurrentText())
+
     }
 
     void loadEntityTagsFile(ActionEvent actionEvent) {
@@ -122,10 +135,6 @@ public class TaggerController {
                 e.printStackTrace()
             }
         }
-    }
-
-    void updateQueryTextFieldFromModel() {
-        queryTextArea.setText(model.getCurrentQueryText())
     }
 
     void saveQueryEdits() {
@@ -151,8 +160,48 @@ public class TaggerController {
         //Bindings for various UI components
         lineNumberMaxLabel.textProperty().bind(model.lineNumberMaxProperty.asString())
         queryNumberMaxLabel.textProperty().bind(model.queryNumberMaxProperty.asString())
+        queryTextArea.editableProperty().bindBidirectional(editQueryToggleButton.selectedProperty())
+
+        //Can't bind because it doesn't allow text area to be editable, using a change listener instead
+//        queryTextArea.textProperty().bind(model.currentQueryTextProperty)
+//        queryNumberTextField.textProperty().bind(model.currentQueryIndexProperty.asString())
+
+        //Bind currentQueryTextProperty and query Number to when index changes but not the other way round
+        //Also, displays starting from 1 not 0
+        model.currentQueryIndexProperty.addListener(new ChangeListener() {
+            @Override
+            void changed(ObservableValue o, Object oldVal,
+                         Object newVal) {
+                model.currentQueryTextProperty.set(model.queryList[(int) newVal].getCurrentText())
+                queryNumberTextField.setText(((int) newVal + 1).toString())
+            }
+        })
+
+        model.currentQueryTextProperty.addListener(new ChangeListener() {
+            @Override
+            void changed(ObservableValue o, Object oldVal,
+                         Object newVal) {
+                queryTextArea.setText(model.currentQueryTextProperty.get())
+            }
+        })
 
     }
 
 
+    void selectPreviousQuery(ActionEvent actionEvent) {
+        if (model.currentQueryIndexProperty.get() != 0) {
+            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() - 1)
+        }
+    }
+
+    void selectNextQuery(ActionEvent actionEvent) {
+        int maxIndex = model.queryList.size() - 1
+        if (model.currentQueryIndexProperty.get() != maxIndex)
+            model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
+
+    }
+
+    void retokenizeQuery(ActionEvent actionEvent) {}
+
+    void selectPreviousLine(ActionEvent actionEvent) {}
 }

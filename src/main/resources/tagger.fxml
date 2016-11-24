@@ -1,25 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-
-<VBox fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.112-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0"
+      xmlns="http://javafx.com/javafx/8.0.112" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
    <children>
       <MenuBar prefHeight="0.0" prefWidth="600.0">
          <menus>
@@ -83,11 +69,16 @@
                            <children>
                               <FlowPane>
                                  <children>
-                                    <Button mnemonicParsing="false" text="Previous" />
-                                    <Button mnemonicParsing="false" text="Next" />
-                                    <Button mnemonicParsing="false" text="Save Edits" />
-                                    <Button mnemonicParsing="false" text="Retokenize" />
-                                    <ToggleButton mnemonicParsing="false" text="Toggle Editable" textAlignment="JUSTIFY" />
+                                     <Button fx:id="previousQueryButton" mnemonicParsing="false"
+                                             onAction="#selectPreviousQuery" text="Previous"/>
+                                     <Button fx:id="nextQueryButton" mnemonicParsing="false" onAction="#selectNextQuery"
+                                             text="Next"/>
+                                     <Button fx:id="saveQueryEditsButton" mnemonicParsing="false"
+                                             onAction="#saveQueryEdits" text="Save Edits"/>
+                                     <Button fx:id="retokenizeQueryButton" mnemonicParsing="false"
+                                             onAction="#retokenizeQuery" text="Retokenize"/>
+                                     <ToggleButton fx:id="editQueryToggleButton" mnemonicParsing="false"
+                                                   text="Toggle Editable" textAlignment="JUSTIFY"/>
                                  </children>
                               </FlowPane>
                            </children>
@@ -127,27 +118,24 @@
                   </HBox>
                   <HBox prefHeight="20.0" prefWidth="446.0">
                      <children>
-                        <Button fx:id="previousLineButton" mnemonicParsing="false" text="Previous">
+                         <Button fx:id="previousLineButton" mnemonicParsing="false" onAction="#selectPreviousLine"
+                                 text="Previous">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" text="Next">
+                         <Button fx:id="nextLine" mnemonicParsing="false" text="Next">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" text="Save Edits">
+                         <Button fx:id="saveTokenEdits" mnemonicParsing="false" text="Save Edits">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" text="Retokenize">
-                           <HBox.margin>
-                              <Insets right="2.0" />
-                           </HBox.margin>
-                        </Button>
-                        <ToggleButton mnemonicParsing="false" text="Toggle Editable" textAlignment="JUSTIFY">
+                         <ToggleButton fx:id="editTokenToggleButton" mnemonicParsing="false" text="Toggle Editable"
+                                       textAlignment="JUSTIFY">
                            <HBox.margin>
                               <Insets right="2.0" />
                            </HBox.margin>

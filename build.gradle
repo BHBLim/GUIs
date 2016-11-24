@@ -66,7 +66,7 @@ apply plugin: 'javafx-gradle-plugin'
 //JavaFX
 jfx {
     // minimal requirement for jfxJar-task
-    mainClass = 'com.wooppy.gui.groovyjavafx.Main'
+    mainClass = 'com.wooppy.gui.groovyjavafx.TaggerApp'
 
     // minimal requirement for jfxNative-task
     vendor = 'Basil'
