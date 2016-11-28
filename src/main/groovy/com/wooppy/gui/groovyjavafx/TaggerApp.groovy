@@ -18,13 +18,13 @@ public class TaggerApp extends Application {
          root = (Parent)loader.load()
 
          TaggerController controller = (TaggerController)loader.getController()
-        primaryStage.setTitle("Tagger GUI");
-        primaryStage.setScene(new Scene(root, 900, 650));
-        primaryStage.show();
+        primaryStage.setTitle("Tagger GUI")
+        primaryStage.setScene(new Scene(root, 900, 650))
+        primaryStage.show()
     }
 
 
     public static void main(String[] args) {
-        launch(TaggerApp.class, args);
+        launch(TaggerApp.class, args)
     }
 }

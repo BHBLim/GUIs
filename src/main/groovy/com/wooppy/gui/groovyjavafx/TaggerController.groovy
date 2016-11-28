@@ -9,6 +9,7 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.layout.FlowPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.scene.text.Text
@@ -58,12 +59,17 @@ EXTRA:\t\t[37;45m:\t\tWHITE_ON_PURPLE:\tI-EXTRACAPABILITIES
 ECO:\t\t[37;40m:\t\tWHITE_ON_BLACK:\t\tI-ECO
 NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
+    HashMap<String, String> keymap = new HashMap<String, String>()
+
     ArrayList<String> tagList = new ArrayList<String>()
     /**
      * Initialize the controller. By default, all methods and variables are public
      * if nothing is specified
      */
     void initialize() {
+
+        keymap.put("qq", "Poop")
+        keymap.put("gay", "No")
 
         model = new TaggerModel()
 
@@ -73,11 +79,22 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             try {
                 tagList.add(parts.first())
             } catch (Exception e) {
+                println e.getMessage()
             }
         }
 
         tagList.each(){
             tagFlowPane.getChildren().add(new Button(it))
+        }
+
+        5.times {
+            tokenTagPairHBox.getChildren().add(0, new TokenTagBox() {
+                int counter = 0
+                @Override
+                void handleSelectSingleButton(ActionEvent actionEvent) {
+                    println "Testing: ${counter}"
+                }
+            })
         }
 
         //Bindings for various UI components
@@ -156,9 +173,11 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
     @FXML VBox topBox
     @FXML TextArea queryTextArea
     @FXML ListView tagListView
-    @FXML FlowPane tagFlowPane ;
+    @FXML FlowPane tagFlowPane
+    @FXML ScrollPane tokenTagPairScrollPane
+    @FXML HBox tokenTagPairHBox
 
-    //Index start from 1
+    //Index starts from 1
     @FXML TextField queryNumberTextField
     @FXML Label queryNumberMaxLabel
     @FXML TextField lineNumberTextField
@@ -168,8 +187,8 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
     @FXML Button previousLineButton
     @FXML Button nextLineButton
     @FXML Button saveTokenEditsButton
-    @FXML
-    TextField tokenTextField
+    @FXML TextField tokenTextField
+    @FXML TextArea tokenizedTextArea
 
     //endregion
 
@@ -300,13 +319,64 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             pretag()
         }
 
-        StringBuilder sb = new StringBuilder()
-        model.currentQuery.taggedTokens.each(){
-            sb.append(it.getLabel().originalText() + "  ")
-            println it.getLabel()
+        tokenTagPairHBox.getChildren().clear()
+
+        model.currentQuery.taggedTokens.eachWithIndex{ TaggerModel.TokenTagPair pair, int i ->
+            tokenTagPairHBox.getChildren().add(new TokenTagBox(pair.getLabel().toString(), i, "O"){
+
+                TaggerModel.TokenTagPair tokenTagPair = model.currentQuery.taggedTokens[i]
+
+                @Override
+                void handleSelectedCheckbox(ActionEvent actionEvent) {
+                    isSelected = this.selectedCheckbox.isSelected()
+                }
+
+                @Override
+                void handleSelectSingleButton(ActionEvent actionEvent) {
+                    //TODO implement focus here
+                }
+
+                @Override
+                void handleTagCodeField(ActionEvent actionEvent) {
+                    //TODO handle the code inputs here
+                    try {
+                        String value = keymap.get(this.tagCodeTextField.getText().trim().toLowerCase())
+                        if (value != null){
+                            this.setTag(value)
+                              this.tokenTagPair.tagList[0] = value
+                            println model.currentQuery.taggedTokens[i].tagList[0]
+                            this.tagCodeTextField.setPromptText(this.tagCodeTextField.getText())
+                        }
+                    } catch (Exception e) {
+                        println e.getMessage()
+                        this.tagCodeTextField.setPromptText("Invalid")
+                    }
+                    this.tagCodeTextField.clear()
+                }
+
+                @Override
+                void handleEditTokenTextField(ActionEvent actionEvent) {
+                    println actionEvent.getEventType()
+                    this.setToken(this.editTokenTextField.getText())
+                    this.editTokenTextField.setPromptText("Edited")
+                    this.editTokenTextField.clear()
+                }
+
+                //TODO More overrides for menuitems here
+
+
+            })
         }
 
-        tokenTextField.setText(sb.toString())
+        StringBuilder sb = new StringBuilder()
+        model.currentQuery.taggedTokens.each(){
+            sb.append(it.getLabel().originalText() + " ")
+//            println it.getLabel()
+        }
+
+        tokenizedTextArea.setText(sb.toString())
+
+//        tokenTextField.setText(sb.toString())
     }
 
     void goToPreviousQuery(){

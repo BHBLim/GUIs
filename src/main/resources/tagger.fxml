@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0"
-      xmlns="http://javafx.com/javafx/8.0.65" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
+
+<VBox fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
    <children>
       <MenuBar prefHeight="25.0" prefWidth="997.0">
          <menus>
@@ -84,19 +95,18 @@
                         </HBox>
                          <Label text="Original Text:">
                              <font>
-                                 <Font name="System Bold" size="13.0"/>
+                                 <Font name="System Bold" size="13.0" />
                              </font>
                          </Label>
-                         <TextArea fx:id="queryTextArea" prefHeight="162.0" prefWidth="360.0"
-                                   promptText="Load a file from the top" wrapText="true"/>
+                         <TextArea fx:id="queryTextArea" prefHeight="162.0" prefWidth="360.0" promptText="Load a file from the top" wrapText="true" />
                      </children>
                      <padding>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </padding></VBox>
                   <VBox prefHeight="457.0" prefWidth="451.0">
                      <children>
-                         <Label text="Tag Chooser:"/>
-                         <FlowPane fx:id="tagFlowPane" prefHeight="350.0" prefWidth="523.0"/>
+                         <Label text="Tag Chooser:" />
+                         <FlowPane fx:id="tagFlowPane" prefHeight="350.0" prefWidth="523.0" />
                      </children>
                      <padding>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
@@ -110,50 +120,50 @@
                          <children>
                              <Label text="Tokenized Text:">
                                  <font>
-                                     <Font name="System Bold" size="13.0"/>
+                                     <Font name="System Bold" size="13.0" />
                                  </font>
                              </Label>
-                             <TextArea editable="false" prefHeight="310.0" prefWidth="281.0"/>
+                             <TextArea fx:id="tokenizedTextArea" editable="false" prefHeight="310.0" prefWidth="281.0" wrapText="true" />
                      </children>
                      </VBox>
                      <VBox prefHeight="298.0" prefWidth="906.0">
                          <children>
-                             <Label text="Token-tag Pairs:"/>
+                             <Label text="Token-tag Pairs:" />
                              <HBox prefHeight="20.0" prefWidth="446.0">
                                  <children>
-                                     <Button fx:id="previousLineButton" mnemonicParsing="false"
-                                             onAction="#handlePreviousLineButton" text="Previous">
+                                     <Button fx:id="previousLineButton" mnemonicParsing="false" onAction="#handlePreviousLineButton" text="Previous">
                                          <HBox.margin>
-                                             <Insets right="2.0"/>
+                                             <Insets right="2.0" />
                                          </HBox.margin>
                                      </Button>
-                                     <Button fx:id="nextLineButton" mnemonicParsing="false"
-                                             onAction="#handleNextLineButton" text="Next">
+                                     <Button fx:id="nextLineButton" mnemonicParsing="false" onAction="#handleNextLineButton" text="Next">
                                          <HBox.margin>
-                                             <Insets right="2.0"/>
+                                             <Insets right="2.0" />
                                          </HBox.margin>
                                      </Button>
-                                     <Button fx:id="saveTokenEditsButton" mnemonicParsing="false"
-                                             onAction="#handleSaveTokenEditsButton" text="Save Edits">
+                                     <Button fx:id="saveTokenEditsButton" mnemonicParsing="false" onAction="#handleSaveTokenEditsButton" text="Save Edits">
                                          <HBox.margin>
-                                             <Insets right="2.0"/>
+                                             <Insets right="2.0" />
                                          </HBox.margin>
                                      </Button>
                                  </children>
                              </HBox>
-                             <ScrollPane fx:id="tokenTagPairScrollPane">
+                             <ScrollPane fx:id="tokenTagPairScrollPane" VBox.vgrow="ALWAYS">
                                  <content>
-                                     <TextField fx:id="tokenTextField" maxHeight="-Infinity" maxWidth="-Infinity"
-                                                prefHeight="221.0" prefWidth="900.0">
-                                         <font>
-                                             <Font name="Monospaced Regular" size="13.0"/>
-                                         </font>
-                                     </TextField>
+                              <HBox fx:id="tokenTagPairHBox">
+                                 <children>
+                                           <TextField fx:id="tokenTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="221.0" prefWidth="900.0">
+                                               <font>
+                                                   <Font name="Monospaced Regular" size="13.0" />
+                                               </font>
+                                           </TextField>
+                                 </children>
+                              </HBox>
                                  </content>
                              </ScrollPane>
                          </children>
                          <padding>
-                             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                             <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                          </padding>
                      </VBox>
                  </items>
