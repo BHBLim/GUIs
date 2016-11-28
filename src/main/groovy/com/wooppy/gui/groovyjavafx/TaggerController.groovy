@@ -81,7 +81,6 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
         }
 
         //Bindings for various UI components
-        lineNumberMaxLabel.textProperty().bind(model.lineListSizeProperty.asString())
         queryNumberMaxLabel.textProperty().bind(model.queryListSizeProperty.asString())
         queryTextArea.editableProperty().bindBidirectional(editQueryToggleButton.selectedProperty())
 
