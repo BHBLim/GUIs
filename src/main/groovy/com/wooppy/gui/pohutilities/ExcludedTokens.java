@@ -120,7 +120,7 @@ public class ExcludedTokens {
 
                 for (String temp2 : uniqueexcludedtokens) {
                     if (token.equals(temp2.trim().toLowerCase())) {
-                        System.out.println("Line " + i + " of the Lookup Dictionary contains the token [" + arrayoftempparts[0] + "] that matches the Excluded token [" + temp2 + "]");
+                        System.out.println("Line " + i + " of the Lookup Dictionary contains the tokenText [" + arrayoftempparts[0] + "] that matches the Excluded tokenText [" + temp2 + "]");
 
                     }
                 }

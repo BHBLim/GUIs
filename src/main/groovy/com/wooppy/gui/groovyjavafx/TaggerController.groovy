@@ -5,12 +5,13 @@ import edu.stanford.nlp.process.CoreLabelTokenFactory
 import edu.stanford.nlp.process.PTBTokenizer
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
-import javafx.collections.FXCollections
 import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.scene.control.*
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.VBox
+import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.stage.FileChooser
 
 /**
@@ -58,7 +59,6 @@ ECO:\t\t[37;40m:\t\tWHITE_ON_BLACK:\t\tI-ECO
 NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
     ArrayList<String> tagList = new ArrayList<String>()
-
     /**
      * Initialize the controller. By default, all methods and variables are public
      * if nothing is specified
@@ -67,7 +67,7 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
         model = new TaggerModel()
 
-        //Laziness is a sin
+        //Laziness is a sin, just populating buttons lazily right now
         copyPaste.eachLine(){
             ArrayList<String> parts = it.tokenize("\t")
             try {
@@ -114,6 +114,19 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             }
         })
 
+        //Adjust width of tokens text field according to text
+        tokenTextField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> ob, String o,
+                                String n) {
+                // expand the textfield
+                Text tempText = new Text(n)
+                tempText.setFont(Font.font("Monospaced", 13))
+                def width = tempText.getLayoutBounds().getWidth()
+                tokenTextField.setPrefWidth(width + 10);
+            }
+        });
+
     }
 
     TaggerModel model
@@ -137,8 +150,7 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
     //endregion
 
-    //----------------FXML dependency injection part with the @FXML annotation------------//
-    //Each par
+    //region FXML dependency injection
     /**
      * Highest level component of the window
      */
@@ -157,8 +169,10 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
     @FXML Button previousLineButton
     @FXML Button nextLineButton
     @FXML Button saveTokenEditsButton
+    @FXML
+    TextField tokenTextField
 
-    // End FXML injection
+    //endregion
 
     /**
      * Load a query file and loads contents into memory.
@@ -273,19 +287,27 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
     void handleSaveTokenEditsButton(ActionEvent actionEvent) {}
 
+    /**
+     * Tokenize currently stored query
+     */
     void tokenizeQuery(){
         StringReader stringReader = new StringReader(model.currentQuery.currentText)
         PTBTokenizer<CoreLabel> ptbt = new PTBTokenizer<>(stringReader,
-                new CoreLabelTokenFactory(), "")
+                new CoreLabelTokenFactory(), "invertible,normalizeCurrency=false,tokenizeNLs=true")
 
         model.currentQuery.taggedTokens.clear()
         ptbt.each() { label->
-            model.currentQuery.taggedTokens.add(new TaggerModel.TokenTagPair(token:label.toString()) )
+            model.currentQuery.taggedTokens.add(new TaggerModel.TokenTagPair(label))
             pretag()
         }
+
+        StringBuilder sb = new StringBuilder()
         model.currentQuery.taggedTokens.each(){
-            println it.getToken()
+            sb.append(it.getLabel().originalText() + "  ")
+            println it.getLabel()
         }
+
+        tokenTextField.setText(sb.toString())
     }
 
     void goToPreviousQuery(){
@@ -295,7 +317,7 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             String saveAndProceed = "Save and Proceed"
             String discardChanges = "Discard Changes and Proceed"
             ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(saveAndResume, saveAndProceed, discardChanges )
-            choiceDialog.setContentText("You've made some changes to the query text but have not saved them. What do you want to do?")
+            choiceDialog.setContentText("You've made some changes to the query text but have not saved them.\nWhat do you want to do?")
             //Ask if you want to save edits
             choiceDialog.showAndWait().ifPresent() { response ->
                 switch (response) {
@@ -331,7 +353,7 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             String saveAndProceed = "Save and Proceed"
             String discardChanges = "Discard Changes and Proceed"
             ChoiceDialog<String> choiceDialog = new ChoiceDialog<String>(saveAndResume, saveAndProceed, discardChanges )
-            choiceDialog.setContentText("You've made some changes to the query text but have not saved them. What do you want to do?")
+            choiceDialog.setContentText("You've made some changes to the query text but have not saved them.\nWhat do you want to do?")
             //Ask if you want to save edits
             choiceDialog.showAndWait().ifPresent() { response ->
                 switch (response) {

@@ -6,6 +6,7 @@
 
 package com.wooppy.gui.groovyjavafx
 
+import edu.stanford.nlp.ling.CoreLabel
 import javafx.beans.property.IntegerProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
@@ -65,16 +66,21 @@ class TaggerModel {
     ArrayList<TokenTagPair> currentTokenList = new ArrayList<TokenTagPair>()
 
     /**
-     * An inner class to store anything associated for a given token
+     * An inner class to store anything associated for a given tokenText
      */
     static class TokenTagPair {
-        String token
+        CoreLabel label
         /**
          * Could possibly make this multiple tags?
+         * Right now I'm just using a single element for simplicity and our current use case.
          * TODO Look into making multi tags
          */
         ArrayList<String> tagList = new ArrayList<String>()
         Boolean isAmbiguous = false
+
+        TokenTagPair(CoreLabel inputLabel) {
+            this.label = inputLabel
+        }
     }
 
     /**

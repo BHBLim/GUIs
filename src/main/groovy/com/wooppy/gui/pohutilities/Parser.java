@@ -14,7 +14,7 @@ package com.wooppy.gui.pohutilities; /******************************************
  *  The input text file containing the sentences is named input.txt and placed 
  *  in the Data directory [Data/input.txt].
  *
- *  The output text file containing the token-tag pairs is named output.txt and 
+ *  The output text file containing the tokenText-tag pairs is named output.txt and
  *  placed in the Data directory [Data/output.txt].
  *
  *
@@ -139,9 +139,9 @@ public class Parser {
 
             if (mapoftokentagpairs.containsKey(stemp.toLowerCase())) {
 
-                System.out.println("There is a conflict: the excluded token [" + stemp + "] is in the Dictionary.");
+                System.out.println("There is a conflict: the excluded tokenText [" + stemp + "] is in the Dictionary.");
                 System.out.println("The Dictionary entry is: [" + stemp + "\t" + mapoftokentagpairs.get(stemp.toLowerCase()) + "]");
-                System.out.print("Delete either the Dictionary entry (1) or the excluded token (2): [Default is (1)]");
+                System.out.print("Delete either the Dictionary entry (1) or the excluded tokenText (2): [Default is (1)]");
 
                 // START: Codes to handle user inputs...
                 boolean redoflag = true;
@@ -169,13 +169,13 @@ public class Parser {
 
                                     case 2:
                                         excludeddeleteitems.add(stemp.toLowerCase());
-                                        System.out.println("Deleted the excluded token.");
+                                        System.out.println("Deleted the excluded tokenText.");
 
                                         break;
 
                                 }
 
-                                redoflag = false; // Stop listening to user input for this token.
+                                redoflag = false; // Stop listening to user input for this tokenText.
 
                             }
 
@@ -197,7 +197,7 @@ public class Parser {
                         dictionarydeleteitems.add(stemp.toLowerCase());
                         System.out.println("Deleted the Dictionary entry.");
 
-                        redoflag = false; // Stop listening to user input for this token.
+                        redoflag = false; // Stop listening to user input for this tokenText.
 
                     }
 
@@ -271,7 +271,7 @@ public class Parser {
 
                 if (mapoftokentagpairs.containsKey(stemp.toLowerCase()) & !uxttemp.isEmpty()) {
 
-                    System.out.println("There is a conflict: the excluded token [" + stemp + "] is in the Dictionary.");
+                    System.out.println("There is a conflict: the excluded tokenText [" + stemp + "] is in the Dictionary.");
                     System.out.println("The Dictionary entry is: [" + stemp + "\t" + mapoftokentagpairs.get(stemp.toLowerCase()) + "]");
                     System.out.print("Please resolve the conflict before proceeding. Exiting...");
                     System.exit(1);

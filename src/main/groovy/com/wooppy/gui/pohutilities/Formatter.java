@@ -6,7 +6,7 @@ package com.wooppy.gui.pohutilities; /******************************************
  *  Execution:    java -cp ./JarFiles/stanford-corenlp-3.6.0.jar:. Tagger
  *
  *  The Java com.wooppy.tagger.pohutilities.Formatter class contains all fields and methods associated with
- *  token/tag formatting functionality.
+ *  tokenText/tag formatting functionality.
  *
  *
  *
@@ -206,5 +206,5 @@ public class Formatter {
 
 // Codes for debugging:
 
-// System.out.println("setTokenTag - token: " + token);
+// System.out.println("setTokenTag - tokenText: " + tokenText);
 // System.out.println("setTokenTag - tag: " + tag);

@@ -5,7 +5,7 @@ package com.wooppy.gui.pohutilities; /******************************************
  *  Execution:    java -cp ./JarFiles/stanford-corenlp-3.6.0.jar:. com.wooppy.tagger.pohutilities.Parser
  *
  *  A class that encapsulates all entity-tagged tokens in the form of
- *  (token)-(entity-tag) pairs. These entity-tagged tokens are found in a text
+ *  (tokenText)-(entity-tag) pairs. These entity-tagged tokens are found in a text
  *  file named dictionary.txt and placed in the Data directory.
  *
  *  This class is used to pre-tag new training data
@@ -64,7 +64,7 @@ public class LookupDictionary {
                         if (!tag.equals(NOTAG)) {
                             badtokentagpairs.add(token + DATA_SEPARATOR + tag);
 
-                            // System.out.println("Not entered into the Lookup Dictionary. Token: " + token + " Tag: " + ANSI_ESC + "[31;47m:" + tag + ANSI_RESET);
+                            // System.out.println("Not entered into the Lookup Dictionary. Token: " + tokenText + " Tag: " + ANSI_ESC + "[31;47m:" + tag + ANSI_RESET);
 
                         }
 
