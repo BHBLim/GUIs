@@ -11,9 +11,14 @@ import javafx.scene.control.*
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.text.Font
+import javafx.scene.text.FontWeight
 import javafx.scene.text.Text
+import javafx.scene.text.TextFlow
 import javafx.stage.FileChooser
+
+import java.time.Instant
 
 /**
  * Handles application logic and the interaction between the UI and background model
@@ -59,43 +64,85 @@ EXTRA:\t\t[37;45m:\t\tWHITE_ON_PURPLE:\tI-EXTRACAPABILITIES
 ECO:\t\t[37;40m:\t\tWHITE_ON_BLACK:\t\tI-ECO
 NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
-    HashMap<String, String> keymap = new HashMap<String, String>()
+    String defaultKeyMap =
+            '''##Comments are prepended by ##
+##Each column is delimited by a tab
+##You can bind the same tag to multiple keys
+##Display Name\tActual Tag\tKey Code
+PREFERENCE:\tI-PREFERENCE\t0
+ITEM\tI-ITEM\t1
+PRICE\tI-PRICE\t2
+BRAND\tI-BRAND\t3
+MAINTENANCE\tI-MAINTENANCECOST\t4
+USEDNESS\tI-USEDNESS\t5
+USEDON\tI-USEDON\t6
+BATTERY\tI-ECBATTERY\t7
+STEERING\tI-STEERINGSYSTEM\t8
+AGE\tI-AGE\t9
+BODYSTYLE\tI-BODYSTYLE\t10
+TRANSM\tI-TRANSMISSION\t11
+DOORS\tI-DOORNUMBER\t12
+SIZE\tI-OVERALLSIZE\t13
+USAGE\tI-USAGE\t14
+USEDBY\tI-USEDBY\t15
+WARRANTY\tI-WARRANTY\t16
+PASSENGERS\tI-PASSENGERSIZE\t17
+EXTERIOR\tI-EXTERIOR\t18
+BRAKE\tI-BRAKE\t19
+CATEGORY\tI-CATEGORY\t20
+PERFORM\tI-GENERALPERFORMANCE\t21
+SUSPENS\tI-SUSPENSION\t22
+ENGINE\tI-ENGINE\t23
+WHEELTYRE\tI-TYRES\t24
+CARGO\tI-CARGOSIZE\t25
+LUXURY\tI-LUXURY\t26
+OFFROAD\tI-OFFROADCAPABILITY\t27
+SAFETY\tI-SAFETY\t28
+INTERIOR\tI-INTERIOR\t29
+TOW\tI-TOWINGCAPACITY\t30
+FUEL\tI-FUELTYPE\t31
+LONGEVITY\tI-LONGEVITY\t32
+EXTRA\tI-EXTRACAPABILITIES\t33
+ECO\tI-ECO\t34
+NOT\tI-NOT\t35
+O\tO\tx'''
+
+    String defaultSentence = "Hello I want to buy a car that is fast and fun to drive.\nPrice is not a problem"
 
     ArrayList<String> tagList = new ArrayList<String>()
+
     /**
      * Initialize the controller. By default, all methods and variables are public
      * if nothing is specified
      */
     void initialize() {
-
-        keymap.put("qq", "Poop")
-        keymap.put("gay", "No")
-
         model = new TaggerModel()
 
+        model.queryList.clear()
+        model.queryList.add(new TaggerModel.Query(defaultSentence))
+
+        //Initialize default keymap
+        defaultKeyMap.eachLine() { it ->
+            readKeyMapLine(it)
+        }
+
+        model.keyMap.each() {
+            tagFlowPane.getChildren().add(new Button(it.getKey() + ": " + it.getValue().getDisplayText()))
+        }
+
         //Laziness is a sin, just populating buttons lazily right now
-        copyPaste.eachLine(){
-            ArrayList<String> parts = it.tokenize("\t")
-            try {
-                tagList.add(parts.first())
-            } catch (Exception e) {
-                println e.getMessage()
-            }
-        }
-
-        tagList.each(){
-            tagFlowPane.getChildren().add(new Button(it))
-        }
-
-        5.times {
-            tokenTagPairHBox.getChildren().add(0, new TokenTagBox() {
-                int counter = 0
-                @Override
-                void handleSelectSingleButton(ActionEvent actionEvent) {
-                    println "Testing: ${counter}"
-                }
-            })
-        }
+//        copyPaste.eachLine(){
+//            ArrayList<String> parts = it.tokenize("\t")
+//            try {
+//                tagList.add(parts.first())
+//            } catch (Exception e) {
+//                println e.getMessage()
+//            }
+//        }
+//
+//        tagList.each(){
+//            tagFlowPane.getChildren().add(new Button(it))
+//        }
 
         //Bindings for various UI components
         queryNumberMaxLabel.textProperty().bind(model.queryListSizeProperty.asString())
@@ -126,23 +173,13 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
                          Object newVal) {
                 queryTextArea.setText(model.currentQueryTextProperty.get())
                 model.currentQuery.setCurrentText(model.currentQueryTextProperty.get())
-                tokenizeQuery()
+                if (!model.currentQuery.isTokenized) tokenizeQuery()
+                else redrawWithoutTokenizing()
             }
         })
 
-        //Adjust width of tokens text field according to text
-        tokenTextField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> ob, String o,
-                                String n) {
-                // expand the textfield
-                Text tempText = new Text(n)
-                tempText.setFont(Font.font("Monospaced", 13))
-                def width = tempText.getLayoutBounds().getWidth()
-                tokenTextField.setPrefWidth(width + 10);
-            }
-        });
-
+        tokenizeQuery()
+        resetAllToStart()
     }
 
     TaggerModel model
@@ -176,18 +213,18 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
     @FXML FlowPane tagFlowPane
     @FXML ScrollPane tokenTagPairScrollPane
     @FXML HBox tokenTagPairHBox
+    @FXML
+    TextFlow tokenizedTextFlow
 
     //Index starts from 1
     @FXML TextField queryNumberTextField
     @FXML Label queryNumberMaxLabel
     @FXML TextField lineNumberTextField
-    @FXML Label lineNumberMaxLabel
     @FXML ToggleButton editQueryToggleButton
     @FXML ToggleButton editTokenToggleButton
     @FXML Button previousLineButton
     @FXML Button nextLineButton
     @FXML Button saveTokenEditsButton
-    @FXML TextField tokenTextField
     @FXML TextArea tokenizedTextArea
 
     //endregion
@@ -236,7 +273,7 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
                     }
                 }
 
-                resetAll()
+                resetAllToStart()
 
             } catch (Exception e) {
                 println "You done fecked up when loading the file..."
@@ -245,10 +282,49 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
         }
     }
 
+    void handleLoadDictionaryFileMenuItem() {
+        FileChooser fileChooser = new FileChooser()
+        fileChooser.setTitle("Open Query File")
+        File file = fileChooser.showOpenDialog(topBox.getScene().getWindow())
+        if (file != null) {
+            model.dictionary.clear()
+            try {
+                println "Opening " + file.toString()
+                file.eachLine() { line ->
+                    ArrayList<String> tokenizedLine = line.tokenize('\t')
+                    model.dictionary.put(tokenizedLine[0], tokenizedLine[1])
+                }
+            } catch (IOException e) {
+                println "Could not open the file!"
+                e.printStackTrace()
+            } catch (NullPointerException e) {
+                println "Probably improper formatting..."
+                e.printStackTrace()
+            }
+            model.dictionaryFileLocationProperty.set(file.toString())
+            pretag()
+        }
+    }
+
+    void readKeyMapLine(String line) {
+        if (!line.startsWith(/##/)) {
+            //Assuming the format is
+            //        0   ->   1 -> 2+
+            //DisplayName -> Tag -> KeyCode(s) separated by tab
+            List<String> args = line.tokenize('\t')
+            String displayName = args[0]
+            String actualTag = args[1]
+            Iterator<String> it = args.listIterator(2)
+            it.forEachRemaining() {
+                model.keyMap.put(it, new TaggerModel.EntityTagInfo(displayName, actualTag))
+            }
+        }
+    }
+
     /**
      * Resets all query numbers etc. to the beginning
      */
-    void resetAll() {
+    void resetAllToStart() {
 
         model.currentQueryIndexProperty.set(0)
         model.currentLineIndexProperty.set(0)
@@ -284,6 +360,20 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
      */
     void pretag() {
         //TODO finish pretagging part
+        try {
+            model.currentQuery.taggedTokens.eachWithIndex { it, int index ->
+                it.tagList.clear()
+                String dictionaryTag = model.dictionary.get(it.getLabel().value().trim())
+                if (dictionaryTag != null) {
+                    it.tagList.add(new TaggerModel.EntityTagInfo(dictionaryTag, dictionaryTag))
+                } else {
+                    it.tagList.add(new TaggerModel.EntityTagInfo("O", "O"))
+                }
+                tokenTagPairHBox.getChildren()[index].setTag(it.tagList[0].getDisplayText())
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
     }
 
 
@@ -297,6 +387,10 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
     void handleTokenizeButton(ActionEvent actionEvent) {
         tokenizeQuery()
+    }
+
+    void handlePretagButton(ActionEvent actionEvent) {
+        pretag()
     }
 
     void handlePreviousLineButton(ActionEvent actionEvent) {}
@@ -316,57 +410,16 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
         model.currentQuery.taggedTokens.clear()
         ptbt.each() { label->
             model.currentQuery.taggedTokens.add(new TaggerModel.TokenTagPair(label))
-            pretag()
         }
-
         tokenTagPairHBox.getChildren().clear()
 
+        tokenizedTextFlow.getChildren().clear()
+
         model.currentQuery.taggedTokens.eachWithIndex{ TaggerModel.TokenTagPair pair, int i ->
-            tokenTagPairHBox.getChildren().add(new TokenTagBox(pair.getLabel().toString(), i, "O"){
-
-                TaggerModel.TokenTagPair tokenTagPair = model.currentQuery.taggedTokens[i]
-
-                @Override
-                void handleSelectedCheckbox(ActionEvent actionEvent) {
-                    isSelected = this.selectedCheckbox.isSelected()
-                }
-
-                @Override
-                void handleSelectSingleButton(ActionEvent actionEvent) {
-                    //TODO implement focus here
-                }
-
-                @Override
-                void handleTagCodeField(ActionEvent actionEvent) {
-                    //TODO handle the code inputs here
-                    try {
-                        String value = keymap.get(this.tagCodeTextField.getText().trim().toLowerCase())
-                        if (value != null){
-                            this.setTag(value)
-                              this.tokenTagPair.tagList[0] = value
-                            println model.currentQuery.taggedTokens[i].tagList[0]
-                            this.tagCodeTextField.setPromptText(this.tagCodeTextField.getText())
-                        }
-                    } catch (Exception e) {
-                        println e.getMessage()
-                        this.tagCodeTextField.setPromptText("Invalid")
-                    }
-                    this.tagCodeTextField.clear()
-                }
-
-                @Override
-                void handleEditTokenTextField(ActionEvent actionEvent) {
-                    println actionEvent.getEventType()
-                    this.setToken(this.editTokenTextField.getText())
-                    this.editTokenTextField.setPromptText("Edited")
-                    this.editTokenTextField.clear()
-                }
-
-                //TODO More overrides for menuitems here
-
-
-            })
+            tokenTagPairHBox.getChildren().add(new InteractiveTTBox(pair.getLabel().value(), i, "UNTAGGED:"))
         }
+
+        pretag()
 
         StringBuilder sb = new StringBuilder()
         model.currentQuery.taggedTokens.each(){
@@ -374,9 +427,28 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 //            println it.getLabel()
         }
 
-        tokenizedTextArea.setText(sb.toString())
+//        tokenizedTextArea.setText(sb.toString())
+
+        model.currentQuery.isTokenized = true
 
 //        tokenTextField.setText(sb.toString())
+    }
+
+    void redrawWithoutTokenizing() {
+        tokenTagPairHBox.getChildren().clear()
+        tokenizedTextFlow.getChildren().clear()
+
+        model.currentQuery.taggedTokens.eachWithIndex { TaggerModel.TokenTagPair pair, int i ->
+            tokenTagPairHBox.getChildren().add(new InteractiveTTBox(pair.getLabel().value(), i, pair.getTagList()[0].getDisplayText()))
+        }
+
+        StringBuilder sb = new StringBuilder()
+        model.currentQuery.taggedTokens.each() {
+            sb.append(it.getLabel().originalText() + " ")
+//            println it.getLabel()
+        }
+
+
     }
 
     void goToPreviousQuery(){
@@ -448,6 +520,108 @@ NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
             int maxIndex = model.queryList.size() - 1
             if (model.currentQueryIndexProperty.get() != maxIndex)
                 model.currentQueryIndexProperty.set(model.currentQueryIndexProperty.get() + 1)
+        }
+    }
+
+    /**
+     * This will overwrite the file lul
+     * @param actionEvent
+     */
+    void handleLousyDumpSave(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser()
+        fileChooser.setTitle("Save dump to:")
+        fileChooser.setInitialFileName("outputDump.txt")
+        File file = fileChooser.showSaveDialog(topBox.getScene().getWindow())
+        if (file != null) {
+            try {
+                file.delete()
+                println "Saving " + file.toString()
+                file << "Saved at " + Instant.now() + "\n"
+                model.queryList.each() { query ->
+                    query.taggedTokens.each() { pair ->
+                        file << pair.getLabel().value() + "\t" + pair.getTagList().first().getActualTag() + "\n"
+                    }
+                }
+            } catch (IOException e) {
+                println "Could not save the file!"
+                e.printStackTrace()
+            }
+        }
+
+        pretag()
+    }
+
+    class InteractiveTTBox extends TokenTagBox {
+        Text tokenText = new Text()
+
+        TaggerModel.TokenTagPair tokenTagPair
+
+        @Override
+        void handleSelectedCheckbox(ActionEvent actionEvent) {
+            isSelected = this.selectedCheckbox.isSelected()
+        }
+
+        @Override
+        void handleSelectSingleButton(ActionEvent actionEvent) {
+            //TODO implement focus here
+        }
+
+        @Override
+        void handleTagCodeField(ActionEvent actionEvent) {
+            //TODO handle the code inputs here
+            TaggerModel.EntityTagInfo tagInfo = model.keyMap.get(this.tagCodeTextField.getText().trim())
+            if (tagInfo != null) {
+                this.setTag(tagInfo.displayText)
+                this.tokenTagPair.tagList.clear()
+                this.tokenTagPair.tagList.add(new TaggerModel.EntityTagInfo(tagInfo.displayText, tagInfo.actualTag))
+                this.tagCodeTextField.setPromptText(this.tagCodeTextField.getText())
+                if (tokenTagPairHBox.getChildren()[index + 1] != null) {
+                    try {
+                        tokenTagPairHBox.getChildren()[index + 1].tagCodeTextField.requestFocus()
+                    } catch (Exception e) {
+                        println e.getMessage()
+                    }
+                }
+            }
+            this.tagCodeTextField.clear()
+        }
+
+        @Override
+        void handleEditTokenTextField(ActionEvent actionEvent) {
+            println actionEvent.getEventType()
+            String newText = this.editTokenTextField.getText()
+            this.setToken(newText)
+            this.tokenText.textProperty().set(newText)
+            this.editTokenTextField.setPromptText("Edited")
+            this.tokenTagPair.label.setOriginalText(newText)
+            this.tokenTagPair.label.setValue(newText)
+            this.editTokenTextField.clear()
+        }
+
+        //TODO More overrides for menuitems here
+
+        InteractiveTTBox(String token, Integer index, String tag) {
+            super(token, index, tag)
+            this.tokenTagPair = model.currentQuery.taggedTokens[index]
+            this.tokenText.textProperty().set(this.tokenTagPair.getLabel().originalText())
+
+            tokenizedTextFlow.getChildren().add(this.tokenText)
+            tokenizedTextFlow.getChildren().add(new Text(" "))
+
+            this.tagCodeTextField.focusedProperty().addListener(new ChangeListener() {
+                @Override
+                void changed(ObservableValue o, Object oldVal,
+                             Object newVal) {
+                    if (newVal == true) {
+                        tokenText.setFont(Font.font("System", FontWeight.BOLD, 12))
+                        tokenText.setFill(Color.RED)
+                        //TODO change scrollbar location according to focus
+                    } else {
+                        tokenText.fontProperty().set(Font.font("System", FontWeight.NORMAL, 12))
+                        tokenText.setFill(Color.BLACK)
+                    }
+                }
+            })
         }
     }
 }

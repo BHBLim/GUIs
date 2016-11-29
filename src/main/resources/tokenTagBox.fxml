@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-
-<fx:root type="HBox" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.*?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
    <children>
       <javafx.scene.layout.VBox>
          <children>
@@ -20,14 +14,11 @@
                   <Label fx:id="tokenIndexLabel" text="Number" />
                </children>
             </HBox>
-            <HBox alignment="CENTER">
-               <children>
-                  <Button fx:id="selectSingleButton" alignment="CENTER" mnemonicParsing="false" onAction="#handleSelectSingleButton" text="X" />
-               </children>
-            </HBox>
             <HBox alignment="CENTER" prefHeight="17.0" prefWidth="53.0">
                <children>
-                  <CheckBox fx:id="selectedCheckbox" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleSelectedCheckbox" textAlignment="CENTER" />
+                  <CheckBox fx:id="selectedCheckbox" alignment="CENTER" contentDisplay="GRAPHIC_ONLY"
+                            focusTraversable="false" graphicTextGap="0.0" mnemonicParsing="false"
+                            onAction="#handleSelectedCheckbox" textAlignment="CENTER"/>
                </children>
             </HBox>
             <HBox alignment="CENTER">
@@ -36,7 +27,8 @@
                </children>
             </HBox>
             <TextField fx:id="tagCodeTextField" alignment="CENTER" onAction="#handleTagCodeField" prefHeight="25.0" prefWidth="41.0" promptText="Tag" />
-            <MenuButton alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="49.0" text="M" textAlignment="CENTER">
+            <MenuButton alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="0.0"
+                        mnemonicParsing="false" prefHeight="25.0" prefWidth="55.0" text="+-" textAlignment="CENTER">
               <items>
                 <MenuItem fx:id="insertTokenAfterMenuItem" mnemonicParsing="false" text="Insert token after">
                      <graphic>
@@ -51,10 +43,21 @@
                <children>
                   <Group>
                      <children>
-                        <Label fx:id="tagLabel" alignment="CENTER" focusTraversable="false" layoutY="51.0" rotate="270.0" text="Some tag" />
+                        <Label fx:id="tagLabel" alignment="CENTER" focusTraversable="false" layoutY="51.0"
+                               rotate="270.0" text="Some tag">
+                           <opaqueInsets>
+                              <Insets/>
+                           </opaqueInsets>
+                        </Label>
                      </children>
+                     <VBox.margin>
+                        <Insets top="3.0"/>
+                     </VBox.margin>
                   </Group>
                </children>
+               <VBox.margin>
+                  <Insets/>
+               </VBox.margin>
             </VBox>
          </children>
       </javafx.scene.layout.VBox>

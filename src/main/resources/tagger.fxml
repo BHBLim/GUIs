@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-
-<VBox fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="topBox" maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity" prefHeight="686.0" prefWidth="900.0"
+      xmlns="http://javafx.com/javafx/8.0.60" fx:controller="com.wooppy.gui.groovyjavafx.TaggerController">
    <children>
       <MenuBar prefHeight="25.0" prefWidth="997.0">
          <menus>
@@ -26,10 +15,12 @@
                   <MenuItem mnemonicParsing="false" text="New" />
                   <MenuItem mnemonicParsing="false" onAction="#handleLoadQueryFileMenuItem" text="Open Query File" />
                    <MenuItem mnemonicParsing="false" onAction="#handleLoadEntityTagsMenuItem" text="Open Entity Tags" />
+                   <MenuItem mnemonicParsing="false" onAction="#handleLoadDictionaryFileMenuItem"
+                             text="Open Dictionary File"/>
                   <Menu mnemonicParsing="false" text="Open Recent" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Close" />
-                  <MenuItem mnemonicParsing="false" text="Save" />
+                   <MenuItem mnemonicParsing="false" onAction="#handleLousyDumpSave" text="Lousy Dump Save"/>
                   <MenuItem mnemonicParsing="false" text="Save As…" />
                   <MenuItem mnemonicParsing="false" text="Revert" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -59,7 +50,7 @@
             </Menu>
          </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="625.0" prefWidth="900.0">
+       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="678.0" prefWidth="900.0">
          <items>
             <SplitPane dividerPositions="0.40979955456570155" prefHeight="160.0" prefWidth="200.0">
               <items>
@@ -105,7 +96,11 @@
                      </padding></VBox>
                   <VBox prefHeight="457.0" prefWidth="451.0">
                      <children>
-                         <Label text="Tag Chooser:" />
+                         <Label text="Tags:">
+                             <font>
+                                 <Font name="System Bold" size="12.0"/>
+                             </font>
+                         </Label>
                          <FlowPane fx:id="tagFlowPane" prefHeight="350.0" prefWidth="523.0" />
                      </children>
                      <padding>
@@ -116,19 +111,23 @@
             </SplitPane>
              <SplitPane dividerPositions="0.31737193763919824">
                  <items>
-                     <VBox prefHeight="305.0" prefWidth="314.0">
+                     <VBox>
                          <children>
                              <Label text="Tokenized Text:">
                                  <font>
                                      <Font name="System Bold" size="13.0" />
                                  </font>
                              </Label>
-                             <TextArea fx:id="tokenizedTextArea" editable="false" prefHeight="310.0" prefWidth="281.0" wrapText="true" />
+                             <TextFlow fx:id="tokenizedTextFlow" prefHeight="284.0" prefWidth="282.0"/>
                      </children>
                      </VBox>
                      <VBox prefHeight="298.0" prefWidth="906.0">
                          <children>
-                             <Label text="Token-tag Pairs:" />
+                             <Label text="Token-tag Pairs:">
+                                 <font>
+                                     <Font name="System Bold" size="12.0"/>
+                                 </font>
+                             </Label>
                              <HBox prefHeight="20.0" prefWidth="446.0">
                                  <children>
                                      <Button fx:id="previousLineButton" mnemonicParsing="false" onAction="#handlePreviousLineButton" text="Previous">
@@ -146,18 +145,13 @@
                                              <Insets right="2.0" />
                                          </HBox.margin>
                                      </Button>
+                                     <Button mnemonicParsing="false" onAction="#handlePretagButton"
+                                             text="Tag from Dictionary"/>
                                  </children>
                              </HBox>
                              <ScrollPane fx:id="tokenTagPairScrollPane" VBox.vgrow="ALWAYS">
                                  <content>
                               <HBox fx:id="tokenTagPairHBox">
-                                 <children>
-                                           <TextField fx:id="tokenTextField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="221.0" prefWidth="900.0">
-                                               <font>
-                                                   <Font name="Monospaced Regular" size="13.0" />
-                                               </font>
-                                           </TextField>
-                                 </children>
                               </HBox>
                                  </content>
                              </ScrollPane>

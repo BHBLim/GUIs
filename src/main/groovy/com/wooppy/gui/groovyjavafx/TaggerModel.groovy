@@ -21,6 +21,10 @@ class TaggerModel {
 
     //region Bound Properties
 
+    StringProperty dictionaryFileLocationProperty = new SimpleStringProperty("")
+    StringProperty inputFileLocationProperty = new SimpleStringProperty("")
+    StringProperty entityTagsLocationProperty = new SimpleStringProperty("")
+
     //Index starts from 1
     IntegerProperty currentQueryIndexProperty = new SimpleIntegerProperty(0)
     //Index starts from 1
@@ -66,6 +70,26 @@ class TaggerModel {
     ArrayList<TokenTagPair> currentTokenList = new ArrayList<TokenTagPair>()
 
     /**
+     * Store some entity tag info to be mapped to
+     */
+    static class EntityTagInfo {
+        String displayText
+        String actualTag
+
+        EntityTagInfo(String displayText, String actualTag) {
+            this.displayText = displayText
+            this.actualTag = actualTag
+        }
+    }
+
+    HashMap<String, String> dictionary = new HashMap<String, String>()
+
+    /**
+     * Maps keycodes to entities
+     */
+    LinkedHashMap<String, EntityTagInfo> keyMap = new LinkedHashMap<String, EntityTagInfo>()
+
+    /**
      * An inner class to store anything associated for a given tokenText
      */
     static class TokenTagPair {
@@ -75,11 +99,12 @@ class TaggerModel {
          * Right now I'm just using a single element for simplicity and our current use case.
          * TODO Look into making multi tags
          */
-        ArrayList<String> tagList = new ArrayList<String>()
+        ArrayList<EntityTagInfo> tagList = new ArrayList<EntityTagInfo>()
         Boolean isAmbiguous = false
 
         TokenTagPair(CoreLabel inputLabel) {
             this.label = inputLabel
+            this.tagList.add(new EntityTagInfo("O:", "O"))
         }
     }
 
@@ -94,6 +119,7 @@ class TaggerModel {
         String currentText
 
         ArrayList<TokenTagPair> taggedTokens = new ArrayList<TokenTagPair>()
+        Boolean isTokenized = false
         Boolean isTagged = false
         Boolean hasAmbiguities = false
 
@@ -104,10 +130,7 @@ class TaggerModel {
     }
 
     TaggerModel() {
-        this.queryList = new ArrayList<Query>([new Query(
-                """
-This is just placeholder text
-Open a Query File from above""")])
+        this.queryList = new ArrayList<Query>([new Query("Herro")])
 
         this.currentQuery = this.queryList.first()
     }
