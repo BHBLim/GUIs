@@ -6,8 +6,11 @@ import edu.stanford.nlp.process.PTBTokenizer
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
+import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -24,45 +27,6 @@ import java.time.Instant
  * Handles application logic and the interaction between the UI and background model
  */
 class TaggerController {
-
-    //I am lazy so here are the entity tag things
-    String copyPaste = """
-PREFERENCE:\t[31;47m:\t\tRED_ON_WHITE:\t\tI-PREFERENCE
-ITEM:\t\t[38;5;170m:\t\tPINK:\t\t\tI-ITEM
-PRICE:\t\t[35;47m:\t\tPURPLE_ON_WHITE:\tI-PRICE
-BRAND:\t\t[36;47m:\t\tCYAN_ON_WHITE:\t\tI-BRAND
-MAINTENANCE:\t[32m:\t\t\tGREEN:\t\t\tI-MAINTENANCECOST
-USEDNESS:\t[34;47m:\t\tBLUE_ON_WHITE:\t\tI-USEDNESS
-USEDON:\t\t[33;47m:\t\tYELLOW_ON_WHITE:\tI-USEDON
-BATTERY:\t[37;44m:\t\tWHITE_ON_BLUE:\t\tI-ECBATTERY
-STEERING:\t[38;5;130m:\t\tORANGE:\t\t\tI-STEERINGSYSTEM
-AGE:\t\t[34m:\t\t\tBLUE:\t\t\tI-AGE
-BODYSTYLE:\t[33m:\t\t\tYELLOW:\t\t\tI-BODYSTYLE
-TRANSM:\t\t[37m:\t\t\tWHITE:\t\t\tI-TRANSMISSION
-DOORS:\t\t[31;40m:\t\tRED_ON_BLACK:\t\tI-DOORNUMBER
-SIZE:\t\t[38;5;160m:\t\tDARKORANGE:\t\tI-OVERALLSIZE
-USAGE:\t\t[33;40m:\t\tYELLOW_ON_BLACK:\tI-USAGE
-USEDBY:\t\t[32;47m:\t\tGREEN_ON_WHITE:\t\tI-USEDBY
-WARRANTY:\t[37;43m:\t\tWHITE_ON_YELLOW:\tI-WARRANTY
-PASSENGERS:\t[38;5;150m:\t\tBIEGE:\t\t\tI-PASSENGERSIZE
-EXTERIOR:\t[37;46m:\t\tWHITE_ON_CYAN:\t\tI-EXTERIOR
-BRAKE:\t\t[30m:\t\t\tBLACK:\t\t\tI-BRAKE
-CATEGORY:\t[32;40m:\t\tGREEN_ON_BLACK:\t\tI-CATEGORY
-PERFORM:\t[37;41m:\t\tWHITE_ON_RED:\t\tI-GENERALPERFORMANCE
-SUSPENS:\t[38;5;100m:\t\tOLIVE:\t\t\tI-SUSPENSION
-ENGINE:\t\t[36m:\t\t\tCYAN:\t\t\tI-ENGINE
-WHEELTYRE:\t[38;5;120m:\t\tLIGHTGREEN:\t\tI-TYRES
-CARGO:\t\t[38;5;140m:\t\tLAVENDER:\t\tI-CARGOSIZE
-LUXURY:\t\t[31m:\t\t\tRED:\t\t\tI-LUXURY
-OFFROAD:\t[35;40m:\t\tPURPLE_ON_BLACK:\tI-OFFROADCAPABILITY
-SAFETY:\t\t[34;40m:\t\tBLUE_ON_BLACK:\t\tI-SAFETY
-INTERIOR:\t[37;42m:\t\tWHITE_ON_GREEN:\t\tI-INTERIOR
-TOW:\t\t[36;40m:\t\tCYAN_ON_BLACK:\t\tI-TOWINGCAPACITY
-FUEL:\t\t[30;47m:\t\tBLACK_ON_WHITE:\t\tI-FUELTYPE
-LONGEVITY:\t[35m:\t\t\tPURPLE:\t\t\tI-LONGEVITY
-EXTRA:\t\t[37;45m:\t\tWHITE_ON_PURPLE:\tI-EXTRACAPABILITIES
-ECO:\t\t[37;40m:\t\tWHITE_ON_BLACK:\t\tI-ECO
-NOT:\t\t[38;5;10m:\t\tLIME_GREEN:\t\tI-NOT"""
 
     String defaultKeyMap =
             '''##Comments are prepended by ##
@@ -129,20 +93,6 @@ O\tO\tx'''
         model.keyMap.each() {
             tagFlowPane.getChildren().add(new Button(it.getKey() + ": " + it.getValue().getDisplayText()))
         }
-
-        //Laziness is a sin, just populating buttons lazily right now
-//        copyPaste.eachLine(){
-//            ArrayList<String> parts = it.tokenize("\t")
-//            try {
-//                tagList.add(parts.first())
-//            } catch (Exception e) {
-//                println e.getMessage()
-//            }
-//        }
-//
-//        tagList.each(){
-//            tagFlowPane.getChildren().add(new Button(it))
-//        }
 
         //Bindings for various UI components
         queryNumberMaxLabel.textProperty().bind(model.queryListSizeProperty.asString())
@@ -568,15 +518,26 @@ O\tO\tx'''
 
         @Override
         void handleTagCodeField(ActionEvent actionEvent) {
+            //This actionevent is the enter key
             //TODO handle the code inputs here
             TaggerModel.EntityTagInfo tagInfo = model.keyMap.get(this.tagCodeTextField.getText().trim())
-            if (tagInfo != null) {
+            if (this.tagCodeTextField.getText().isEmpty()) {
+                if (tokenTagPairHBox.getChildren()[index + 1] != null) {
+                    try {
+                        if (tokenTagPairHBox.getChildren()[index + 1] instanceof InteractiveTTBox)
+                            tokenTagPairHBox.getChildren()[index + 1].tagCodeTextField.requestFocus()
+                    } catch (Exception e) {
+                        println e.getMessage()
+                    }
+                }
+            } else if (tagInfo != null) {
                 this.setTag(tagInfo.displayText)
                 this.tokenTagPair.tagList.clear()
                 this.tokenTagPair.tagList.add(new TaggerModel.EntityTagInfo(tagInfo.displayText, tagInfo.actualTag))
                 this.tagCodeTextField.setPromptText(this.tagCodeTextField.getText())
                 if (tokenTagPairHBox.getChildren()[index + 1] != null) {
                     try {
+                        if (tokenTagPairHBox.getChildren()[index + 1] instanceof InteractiveTTBox)
                         tokenTagPairHBox.getChildren()[index + 1].tagCodeTextField.requestFocus()
                     } catch (Exception e) {
                         println e.getMessage()
@@ -608,6 +569,7 @@ O\tO\tx'''
             tokenizedTextFlow.getChildren().add(this.tokenText)
             tokenizedTextFlow.getChildren().add(new Text(" "))
 
+            //When field is focussed
             this.tagCodeTextField.focusedProperty().addListener(new ChangeListener() {
                 @Override
                 void changed(ObservableValue o, Object oldVal,
@@ -615,13 +577,59 @@ O\tO\tx'''
                     if (newVal == true) {
                         tokenText.setFont(Font.font("System", FontWeight.BOLD, 12))
                         tokenText.setFill(Color.RED)
+                        ensureVisible(tokenTagPairScrollPane, InteractiveTTBox.this)
                         //TODO change scrollbar location according to focus
                     } else {
                         tokenText.fontProperty().set(Font.font("System", FontWeight.NORMAL, 12))
                         tokenText.setFill(Color.BLACK)
                     }
+
                 }
             })
+
+            this.tagCodeTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.ENTER && event.isShiftDown()) {
+                        if (tokenTagPairHBox.getChildren()[index - 1] != null && (index != 0)) {
+                            try {
+                                tokenTagPairHBox.getChildren()[index - 1].tagCodeTextField.requestFocus()
+                            } catch (Exception e) {
+                                println e.getMessage()
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+    /**
+     * This is to ensure the TokenTagBoxes are visible within the scrollpane when focused
+     * Also, only scrolls horizontally
+     * @param outer scrollpane
+     * @param node
+     */
+    private static void ensureVisible(ScrollPane pane, javafx.scene.Node node) {
+        double width = pane.getContent().getBoundsInLocal().getWidth()
+        double viewPortWidth = pane.getViewportBounds().getWidth()
+
+        double minX = node.getBoundsInParent().getMinX()
+        double maxX = node.getBoundsInParent().getMaxX()
+
+        println minX + "\t" + maxX
+
+        double currentHPosition = pane.getHvalue()
+
+        println currentHPosition
+
+        // scrolling values range from 0 to 1
+        //This following snippet sets scrollbar position according to width of
+        //viewport etc.
+        if (maxX > currentHPosition * (width - viewPortWidth) + viewPortWidth) {
+            pane.setHvalue(minX / (width - viewPortWidth))
+        } else if (minX < (currentHPosition * (width - viewPortWidth))) {
+            pane.setHvalue((maxX - viewPortWidth) / (width - viewPortWidth))
         }
     }
 }
